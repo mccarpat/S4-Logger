@@ -1,9 +1,9 @@
 
-#define VERSION "0.1.5"
+#define VERSION "0.1.6"
 
 
 /*
- *  Walrus
+ *  S4-Logger
  *  
  *  --- Information -----------------
  *  EGR 699 Project Code
@@ -12,6 +12,7 @@
  *  Sofia Fanourakis
  *  
  *  --- Changelog -------------------
+ *  v0.1.6 - PJM -> To github, changed Walrus to S4-Logger
  *  v0.1.5 - PJM -> Setting up states
  *  v0.1.3 - PJM -> Skeleton Structure
  *  v0.1.0 - PJM -> Initial Creation
@@ -38,11 +39,14 @@
  *  
  *  
  *  --- Notes -----------------------
- *  - I don't know why I named it walrus.
+ *  
  *  - Need to find two pins that can be pulled up/down to identify unique logging units
- * 
- * 
- */
+ *  - Supercap calc:  http://electronics.stackexchange.com/questions/4951/how-do-i-calculate-how-fast-a-capacitor-will-discharge
+ *  - When power dies, write to EEPROM, not SD card.  Then move that to SD card when you ahve power.
+ *  - "<CyL> lem: I read a couple of message in the back log, I suggest you to use a comparator instead of a voltage divider."
+ *  
+ *  
+ */ 
 
 
 // Initial definitions to set up environment
@@ -105,7 +109,7 @@
 #include <stdbool.h>
 #include <util/delay.h>
 #include <SPI.h>
-#include <SD.h>
+#include "SD.h"
 #include "lemtils/Pin.h"
 #include "lemtils/Timer.h" // Includes functions for using the on-board timer. Allows delay(ms). REQUIRES: Timer_Timer1_Initialize(); (Or similar)
 #include <avr/wdt.h>
@@ -309,7 +313,7 @@ void setup() {
   //Serial.println(time);
 
   Serial.println(VERSION);
-  InitializeSDCard();
+  //InitializeSDCard();
   
   while(1)
   {
@@ -339,7 +343,7 @@ void OpenAndWaitForSerialPort( void )
 
 void InitializeSDCard( void )
 {
-   
+   //if(root.isOpen()) root.close();
   Serial.print("Init SD card... ");
   if (!SD.begin(4)) {
     Serial.println("init failed!");
@@ -428,6 +432,8 @@ void LogCCDataToSDCard( void );
 
 void LogCCDataToSDCard( void )
 {
+  // Delete this line once there is no way anything can get stuck in this function (e.g. have proper error handling)
+
   
   //_delay_ms(500);
   Serial.println("CC Data retrieved. [ <- Sim ]"); // Put here something that gets the data (have to have error check everywhere so this is likely to be split up)
@@ -442,14 +448,16 @@ void LogCCDataToSDCard( void )
 
 void state_Recording( void )
 {
+  // Delete this line once there is no way anything can get stuck in this function (e.g. have proper error handling)
+  
   logentry++; Serial.print(logentry); Serial.println(" - In state_Recording( void ). ");
+  
   // REDO THIS WITH ERROR HANDLING
   LogCCDataToSDCard();
+  
   Serial.println("Setting sleeping state... [ <- Sim ]");
+  
   state_SetNext(sleep_until_next_recording);
-  //Green_LED_Flash();
-  
-  
 }
 
 
